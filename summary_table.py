@@ -4,15 +4,14 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
-# --- CẤU HÌNH TÊN FILE ĐẦU VÀO VÀ ĐẦU RA ---
-FILE_TRUOC = "bao_cao_dinh_luong_loi.csv"
+FILE_TRUOC = "bao_cao_dinh_luong_loi.csv" 
 FILE_SAU = "bao_cao_dinh_luong_sau_va_loi.csv"
 OUTPUT_MARKDOWN = "bang_thong_ke_truoc_sau.md"
 OUTPUT_EXCEL = "bang_thong_ke_truoc_sau.xlsx"
 
 def xu_ly_du_lieu_giai_doan(file_path, ten_giai_doan):
     if not os.path.exists(file_path):
-        print(f"⚠ Cảnh báo: Không tìm thấy file: {file_path}")
+        print(f"⚠ Cảnh báo: Không tìm thấy file dữ liệu: {file_path}")
         return None
     df = pd.read_csv(file_path)
     summary = df.groupby(['Mã KB', 'Loại Tấn Công', 'HTTP Status', 'Kết Quả Thực Nghiệm']).agg(
@@ -51,8 +50,14 @@ def tinh_ti_le_giam_thieu(row):
             ti_le = ((pre_count - post_count) / pre_count) * 100
             return f"{ti_le:.2f}%"
         return "0.00%"
-    elif status == '400' and 'Phát hiện Payload độc hại' in bc_ky_thuat:
+    
+    elif status == '400':
+        if 'Sai định dạng Captcha' in bc_ky_thuat or 'Phát hiện Payload độc hại' in bc_ky_thuat:
+            return "100.00% (Vá lỗi thành công)"
         return "100.00%"
+        
+    elif status == '401' and 'Bị chặn bởi Bộ lọc an toàn' in bc_ky_thuat:
+        return "100.00% (Màng lọc WAF RAM)"
     elif status == '201' or (status == '401' and 'Thất bại' in bc_ky_thuat):
         return "Nghiệp vụ sạch"
     else:
@@ -145,6 +150,6 @@ try:
         ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
 
     wb.save(OUTPUT_EXCEL)
-    print(f"✔ Đã xuất file Excel tại: {OUTPUT_EXCEL}")
+    print(f"✔ Đã xuất file Excel hoàn mỹ tại: {OUTPUT_EXCEL}")
 except Exception as e:
     print(f"❌ Lỗi xử lý định dạng Excel: {e}")
