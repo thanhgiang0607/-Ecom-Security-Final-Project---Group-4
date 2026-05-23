@@ -1,4 +1,4 @@
-# 🛡️ Hệ Thống Mô Phỏng Đòn Tấn Công Diện Rộng & Đánh Giá Chỉ Số Giảm Thiểu Rủi Ro ($R_{mit}$)
+# 🛡️ Hệ Thống Mô Phỏng Đòn Tấn Công Diện Rộng & Đánh Giá Chỉ Số Giảm Thiểu Rủi Ro 
 
 Dự án này xây dựng một đường ống dữ liệu (Data Pipeline) tự động bằng Python nhằm thực nghiệm xung kích dữ liệu lớn (Big Data Stress Testing) trên nền tảng Thương mại điện tử thử nghiệm OWASP Juice Shop.
 
@@ -15,10 +15,10 @@ Ecom_Simulation/
 │   ├── dataset_xss.txt
 │   └── dataset_system.txt
 │
-├── run_simulation_3k_final.py
-├── run_mitigation_simulation.py
-├── visualize_3k_metrics.py
-├── visualize_mitigation_comparison.py
+├── simulation.py
+├── remediation.py
+├── results_visualize.py
+├── comparison.py
 ├── summary_table.py
 ├── .gitignore
 └── README.md
@@ -29,11 +29,11 @@ Ecom_Simulation/
 | Thành phần | Vai trò |
 |------------|----------|
 | `datasets/` | Bộ dữ liệu payload mô phỏng SQL Injection, XSS và Command Injection / SSRF |
-| `run_simulation_3k_final.py` | Pha 1 - Mô phỏng trạng thái hệ thống trước giảm thiểu |
-| `run_mitigation_simulation.py` | Pha 2 - Mô phỏng cơ chế giảm thiểu bảo mật |
-| `visualize_3k_metrics.py` | Trực quan hóa chỉ số hiệu năng ban đầu |
-| `visualize_mitigation_comparison.py` | So sánh trước và sau triển khai giảm thiểu |
-| `summary_table.py` | Tổng hợp chỉ số nghiên cứu và tính toán $R_{mit}$ |
+| `simulation.py` | Phase 1 - Mô phỏng trạng thái hệ thống trước giảm thiểu |
+| `remediation.py` | Pha 2 - Mô phỏng cơ chế giảm thiểu bảo mật |
+| `results_visualize.py` | Trực quan hóa chỉ số hiệu năng ban đầu |
+| `comparison.py` | So sánh trước và sau triển khai giảm thiểu |
+| `summary_table.py` | Tổng hợp chỉ số nghiên cứu và tính toán |
 
 ---
 
@@ -59,12 +59,12 @@ pip install requests pandas statistics matplotlib seaborn tabulate openpyxl
 
 ---
 
-## Bước 3. Thực thi Pha 1 — Thu thập số liệu thực trạng
+## Bước 3. Thực thi Phase 1 — Thu thập số liệu thực trạng
 
 Chạy mô phỏng tấn công dữ liệu lớn:
 
 ```bash
-python run_simulation_3k_final.py
+python simulation.py
 ```
 
 Đầu ra:
@@ -75,7 +75,7 @@ bao_cao_dinh_luong_loi.csv
 
 ---
 
-## Bước 4. Thực thi Pha 2 — Đánh giá hiệu quả giảm thiểu
+## Bước 4. Thực thi Phase 2 — Đánh giá hiệu quả giảm thiểu
 
 Chạy cơ chế giả lập bảo vệ:
 
@@ -86,7 +86,7 @@ Chạy cơ chế giả lập bảo vệ:
 Thực thi:
 
 ```bash
-python run_mitigation_simulation.py
+python remediation.py
 ```
 
 Đầu ra:
@@ -102,9 +102,9 @@ bao_cao_dinh_luong_sau_va_loi.csv
 Sinh biểu đồ phân tích:
 
 ```bash
-python visualize_3k_metrics.py
+python results_visualize.py
 
-python visualize_mitigation_comparison.py
+python comparison.py
 ```
 
 Xuất bảng tổng hợp nghiên cứu:
@@ -122,7 +122,7 @@ Sau khi hoàn thành toàn bộ pipeline, hệ thống sinh tự động:
 ### 1. Bảng tổng hợp số liệu
 
 ```text
-bang_thong_ke_truoc_sau_v2.md
+bang_thong_ke_truoc_sau.md
 ```
 
 Phục vụ sao chép trực tiếp vào báo cáo nghiên cứu.
@@ -130,7 +130,7 @@ Phục vụ sao chép trực tiếp vào báo cáo nghiên cứu.
 ### 2. Tệp Excel chuẩn hóa
 
 ```text
-bang_thong_ke_truoc_sau_v2.xlsx
+bang_thong_ke_truoc_sau.xlsx
 ```
 
 Dùng cho phụ lục nghiên cứu và trình bày kết quả.
@@ -202,7 +202,7 @@ __pycache__/
 
 # 👥 Nhóm Thực Hiện
 
-**E-Commerce Security Final Project — Group 4**
+**Đồ án cuối kỳ Bảo mật thương mại điện tử - Nhóm 4**
 
 Môn học: **Bảo mật Thương mại điện tử**
 
