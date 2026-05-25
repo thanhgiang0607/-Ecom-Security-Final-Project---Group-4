@@ -2,10 +2,7 @@
 # GITIGNORE CONFIGURATION - ECOM SECURITY SIMULATION PIPELINE
 # =========================================================================
 
-# Chặn toàn bộ các file kết quả định lượng (Vì code sẽ tự sinh lại khi chạy)
-*.csv
-*.xlsx
-*.xls
+
 
 # CHỈ ĐỊNH: Cho phép push các file dataset dạng .txt trong thư mục datasets
 !datasets/*.txt
