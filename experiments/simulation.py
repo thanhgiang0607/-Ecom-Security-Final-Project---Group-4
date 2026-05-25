@@ -62,7 +62,7 @@ except Exception as e:
     print(f"❌ Lỗi thiết lập tài khoản tự động: {e}")
 
 # =========================================================================
-# THỰC THI THÍ NGHIỆM DIỆN RỘNG (3000 REQUESTS)
+# THỰC THI THÍ NGHIỆM DIỆN RỘNG 
 # =========================================================================
 with open(REPORT_FILE, mode='w', newline='', encoding='utf_8_sig') as csv_file:
     writer = csv.writer(csv_file)
