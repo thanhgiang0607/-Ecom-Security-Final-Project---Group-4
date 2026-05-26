@@ -8,7 +8,7 @@ import numpy as np
 import os
 
 # --- CẤU HÌNH ĐƯỜNG DẪN ---
-FILE_LOG_THO = "bao_cao_dinh_luong_loi.csv"
+FILE_LOG_THO = "../results/bao_cao_dinh_luong_loi.csv"
 OUTPUT_ANH   = "chuong4_owasp_risk_matrix.png"
 
 # ── FONT & STYLE (nền trắng) ─────────────────────────────────────────────────
@@ -49,41 +49,158 @@ def get_sample_data():
 mapping_loi = {'KB_01': 'SQL Injection', 'KB_02': 'Stored XSS', 'KB_03': 'CMDi & SSRF'}
 
 if os.path.exists(FILE_LOG_THO):
+
     df = pd.read_csv(FILE_LOG_THO)
-    df['Mã KB'] = df['Mã KB'].astype(str).str.strip()
-    df['Response Time'] = pd.to_numeric(df['Thời Gian (s)'], errors='coerce')
-    df = df.dropna(subset=['Thời Gian (s)'])
-    dynamic_risk_data = []
-    for ma_kb in ['KB_01', 'KB_02', 'KB_03']:
-        df_sub = df[df['Mã KB'] == ma_kb]
+
+    df.columns = df.columns.str.strip()
+
+    df['Mã KB'] = (
+        df['Mã KB']
+        .astype(str)
+        .str.strip()
+    )
+
+    df['HTTP Status'] = (
+        df['HTTP Status']
+        .astype(str)
+        .str.strip()
+    )
+
+    time_col = (
+        'Response Time'
+        if 'Response Time' in df.columns
+        else 'Thời Gian (s)'
+    )
+
+    df[time_col] = pd.to_numeric(
+        df[time_col],
+        errors='coerce'
+    )
+
+    df = df.dropna(
+        subset=[time_col]
+    )
+
+    dynamic_risk_data=[]
+
+    for ma_kb in ['KB_01','KB_02','KB_03']:
+
+        df_sub=df[
+            df['Mã KB']==ma_kb
+        ]
+
         if df_sub.empty:
             continue
-        total_reqs = len(df_sub)
-        if ma_kb == 'KB_01':
-            vulnerable_reqs = len(df_sub[df_sub['HTTP Status'].isin(['200', '500', 'TIMEOUT'])])
-        elif ma_kb == 'KB_02':
-            vulnerable_reqs = len(df_sub[df_sub['HTTP Status'] == '500'])
+
+        total=len(df_sub)
+
+        if ma_kb=='KB_01':
+
+            vulnerable=len(
+                df_sub[
+                    df_sub['HTTP Status']
+                    .isin([
+                        '200',
+                        '500',
+                        'TIMEOUT'
+                    ])
+                ]
+            )
+
+        elif ma_kb=='KB_02':
+
+            vulnerable=len(
+                df_sub[
+                    df_sub['HTTP Status']
+                    =='500'
+                ]
+            )
+
         else:
-            vulnerable_reqs = len(df_sub[df_sub['HTTP Status'] == '201'])
-        vulnerability_rate = vulnerable_reqs / total_reqs
-        calculated_likelihood = 1.0 + (vulnerability_rate * 8.0)
-        mean_tres = df_sub['Thời Gian (s)'].mean()
-        if ma_kb in ['KB_01', 'KB_03']:
-            calculated_impact = min(8.0 + (mean_tres * 10), 9.0)
+
+            vulnerable=len(
+                df_sub[
+                    df_sub['HTTP Status']
+                    =='201'
+                ]
+            )
+
+        Pvul=vulnerable/total
+
+        likelihood=1+(Pvul*8)
+
+        mean_tres=df_sub[
+            time_col
+        ].mean()
+
+        if ma_kb in [
+            'KB_01',
+            'KB_03'
+        ]:
+
+            impact=min(
+                8+(mean_tres*10),
+                9
+            )
+
         else:
-            calculated_impact = min(5.0 + (mean_tres * 20), 9.0)
-        risk_score = calculated_likelihood * calculated_impact
-        if risk_score >= 50.0:   level = 'Nghiêm trọng (Critical)'
-        elif risk_score >= 35.0: level = 'Cao (High)'
-        elif risk_score >= 15.0: level = 'Trung bình (Medium)'
-        else:                    level = 'Thấp (Low)'
+
+            impact=min(
+                5+(mean_tres*20),
+                9
+            )
+
+        likelihood=round(
+            likelihood,
+            2
+        )
+
+        impact=round(
+            impact,
+            2
+        )
+
+        risk_score=round(
+            likelihood*impact,
+            2
+        )
+
+        if risk_score>=50:
+            level='Nghiêm trọng (Critical)'
+
+        elif risk_score>=35:
+            level='Cao (High)'
+
+        elif risk_score>=15:
+            level='Trung bình (Medium)'
+
+        else:
+            level='Thấp (Low)'
+
         dynamic_risk_data.append({
-            'Mã KB': ma_kb, 'Lỗ hổng': mapping_loi[ma_kb],
-            'Likelihood': round(calculated_likelihood, 2),
-            'Impact':     round(calculated_impact, 2),
-            'Risk Score': round(risk_score, 2), 'Xếp hạng': level
+
+            'Mã KB':ma_kb,
+
+            'Lỗ hổng':
+            mapping_loi[ma_kb],
+
+            'Likelihood':
+            likelihood,
+
+            'Impact':
+            impact,
+
+            'Risk Score':
+            risk_score,
+
+            'Xếp hạng':
+            level
+
         })
-    df_risk = pd.DataFrame(dynamic_risk_data)
+
+    df_risk=pd.DataFrame(
+        dynamic_risk_data
+    )
 else:
     print("⚠️  Không tìm thấy file CSV — dùng dữ liệu mẫu.")
     df_risk = get_sample_data()

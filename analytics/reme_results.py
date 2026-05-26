@@ -188,12 +188,253 @@ plt.close()
 # =========================================================================
 print("ĐANG KHỞI CHẠY MA TRẬN NHIỆT LƯỢNG HÓA RỦI RO OWASP DI ĐỘNG...")
 
-owasp_coordinates = {
-    'KB_01': {'Pha A': [3.27, 9.00], 'Pha B': [1.00, 9.00]},
-    'KB_02': {'Pha A': [9.00, 5.92], 'Pha B': [1.00, 5.92]},
-    'KB_03': {'Pha A': [9.00, 8.92], 'Pha B': [1.00, 8.92]}
+mapping_loi = {
+    'KB_01': 'SQL Injection',
+    'KB_02': 'Stored XSS',
+    'KB_03': 'CMDi & SSRF'
 }
 
+owasp_coordinates = {}
+
+for ma_kb in ['KB_01','KB_02','KB_03']:
+
+    phase_data = {}
+
+    for phase_name, df, time_col in [
+        ('Pha A', df_a, col_time_a),
+        ('Pha B', df_b, col_time_b)
+    ]:
+
+        df_sub = df[df['Mã KB']==ma_kb]
+
+        total_reqs = len(df_sub)
+
+        if total_reqs == 0:
+            continue
+
+        # Pvul (THEO LOGIC CHƯƠNG 4)
+        # 
+        if ma_kb == 'KB_01':
+
+            vulnerable = len(
+                df_sub[
+                    df_sub['HTTP Status']
+                    .isin(['200','500','TIMEOUT'])
+                ]
+            )
+
+        elif ma_kb == 'KB_02':
+
+            vulnerable = len(
+                df_sub[
+                    df_sub['HTTP Status']=='500'
+                ]
+            )
+
+        else:
+
+            vulnerable = len(
+                df_sub[
+                    df_sub['HTTP Status']=='201'
+                ]
+            )
+
+        Pvul = vulnerable / total_reqs
+
+        # LIKELIHOOD
+        likelihood = 1 + (Pvul * 8)
+
+        # IMPACT
+        mean_tres = df_sub[time_col].mean()
+
+        if ma_kb in ['KB_01','KB_03']:
+
+            impact = min(
+                8 + (mean_tres*10),
+                9
+            )
+
+        else:
+
+            impact = min(
+                5 + (mean_tres*20),
+                9
+            )
+
+        phase_data[phase_name] = [
+            round(likelihood,2),
+            round(impact,2)
+        ]
+
+    owasp_coordinates[ma_kb] = phase_data
+    # =========================================================================
+# 📊 PHẦN 4.1: BẢNG LƯỢNG HÓA RỦI RO OWASP ĐỘNG ĐỐI CHỨNG 2 PHA
+# =========================================================================
+
+risk_compare = []
+
+for ma_kb in ['KB_01','KB_02','KB_03']:
+
+    if 'Pha A' not in owasp_coordinates[ma_kb]:
+        continue
+
+    if 'Pha B' not in owasp_coordinates[ma_kb]:
+        continue
+
+    L_a, I_a = owasp_coordinates[ma_kb]['Pha A']
+    L_b, I_b = owasp_coordinates[ma_kb]['Pha B']
+
+    risk_a = round(L_a * I_a,2)
+    risk_b = round(L_b * I_b,2)
+
+    rmit = (
+        ((risk_a-risk_b)/risk_a)*100
+        if risk_a!=0 else 0
+    )
+
+    if risk_b >= 50:
+        level='Critical'
+
+    elif risk_b >=35:
+        level='High'
+
+    elif risk_b >=15:
+        level='Medium'
+
+    else:
+        level='Low'
+
+    risk_compare.append({
+
+        'Mã KB':ma_kb,
+
+        'Nhóm lỗ hổng':
+        mapping_loi[ma_kb],
+
+        'Likelihood A':
+        L_a,
+
+        'Impact A':
+        I_a,
+
+        'Risk Score A':
+        risk_a,
+
+        'Likelihood B':
+        L_b,
+
+        'Impact B':
+        I_b,
+
+        'Risk Score B':
+        risk_b,
+
+        'Risk Level B':
+        level,
+
+        'Rmit (%)':
+        round(rmit,2)
+
+    })
+
+df_risk_compare = pd.DataFrame(
+    risk_compare
+)
+
+overall_phase_a = round(
+    df_risk_compare[
+        'Risk Score A'
+    ].mean(),
+    2
+)
+
+overall_phase_b = round(
+    df_risk_compare[
+        'Risk Score B'
+    ].mean(),
+    2
+)
+
+overall_rmit = round(
+
+    (
+        (
+            overall_phase_a
+            -
+            overall_phase_b
+        )
+        /
+        overall_phase_a
+    )*100,
+
+    2
+
+)
+
+print("\n")
+print("="*130)
+print("MA TRẬN ĐỐI CHỨNG RỦI RO OWASP GIỮA PHA A VÀ PHA B")
+print("="*130)
+
+print(
+    df_risk_compare.to_string(
+        index=False
+    )
+)
+
+print("="*130)
+
+print(
+f"""
+TỔNG THỂ HỆ THỐNG BACKEND
+
+Risk Score Giai đoạn A : {overall_phase_a}
+
+Risk Score Giai đoạn B : {overall_phase_b}
+
+Tỷ lệ giảm thiểu rủi ro Rmit :
+
+{overall_rmit} %
+
+"""
+)
+
+highest_before = df_risk_compare.loc[
+    df_risk_compare[
+        'Risk Score A'
+    ].idxmax()
+]
+
+highest_after = df_risk_compare.loc[
+    df_risk_compare[
+        'Risk Score B'
+    ].idxmax()
+]
+
+print(
+f"""
+PHÂN HỆ RỦI RO CAO NHẤT
+
+Trước khắc phục :
+
+{highest_before['Mã KB']}
+|
+{highest_before['Nhóm lỗ hổng']}
+|
+Risk={highest_before['Risk Score A']}
+
+Sau khắc phục :
+
+{highest_after['Mã KB']}
+|
+{highest_after['Nhóm lỗ hổng']}
+|
+Risk={highest_after['Risk Score B']}
+
+"""
+)
+
+print("="*130)
 grid_size = 5
 heatmap_grid = np.zeros((grid_size, grid_size))
 x_ticks = np.linspace(1, 9, grid_size)
