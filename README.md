@@ -1,50 +1,88 @@
-# 🛡️ Hệ Thống Mô Phỏng Đòn Tấn Công Diện Rộng & Đánh Giá Chỉ Số Giảm Thiểu Rủi Ro 
+# 🛡️ Hệ Thống Mô Phỏng Đòn Tấn Công Diện Rộng & Đánh Giá Chỉ Số Giảm Thiểu Rủi Ro
 
-Dự án này xây dựng một đường ống dữ liệu (Data Pipeline) tự động bằng Python nhằm thực nghiệm xung kích dữ liệu lớn (Big Data Stress Testing) trên nền tảng Thương mại điện tử thử nghiệm OWASP Juice Shop.
+Dự án xây dựng một hệ thống mô phỏng kiểm thử áp lực bảo mật (Security Stress Testing) trên nền tảng thương mại điện tử OWASP Juice Shop thông qua Data Pipeline tự động bằng Python.
 
-Hệ thống thực hiện bóc tách, đánh giá định lượng mã trạng thái HTTP, thời gian phản hồi vi mô ($T_{res}$) trước và sau khi triển khai các cơ chế vá lỗi lớp sâu.
+Hệ thống thực hiện:
+
+- Mô phỏng nhiều dạng payload tấn công phổ biến
+- Thu thập mã trạng thái HTTP và thời gian phản hồi vi mô ($T_{res}$)
+- Định lượng hiệu quả cơ chế giảm thiểu rủi ro
+- Sinh biểu đồ và bảng tổng hợp phục vụ nghiên cứu học thuật
 
 ---
 
 # 📁 1. Cấu Trúc Thư Mục Dự Án
 
 ```text
-Ecom_Simulation/
+Ecom_Security_Final_Project/
+│
+├── analytics/
+│   ├── comparison.py
+│   ├── remediation.py
+│   ├── results_visualize.py
+│   ├── risk_quantitative.py
+│   └── summary_table.py
+│
 ├── datasets/
 │   ├── dataset_sqli.txt
-│   ├── dataset_xss.txt
-│   └── dataset_system.txt
+│   ├── dataset_system.txt
+│   └── dataset_xss.txt
 │
-├── simulation.py
-├── remediation.py
-├── results_visualize.py
-├── comparison.py
-├── summary_table.py
+├── experiments/
+│   ├── remediation.py
+│   └── simulation.py
+│
+├── results/
+│   ├── bao_cao_dinh_luong_loi.csv
+│   ├── bao_cao_dinh_luong_sau_va_loi.csv
+│   ├── chuong4_kb01_sqli.png
+│   ├── chuong4_kb02_xss.png
+│   ├── chuong4_kb03_system.png
+│   ├── chuong4_owasp_risk_matrix.png
+│   ├── chuong4_tres_distribution.png
+│   ├── chuong5_kb01_remediation.png
+│   ├── chuong5_kb02_remediation.png
+│   ├── chuong5_kb03_remediation.png
+│   ├── chuong5_owasp_heatmap_shift.png
+│   ├── chuong5_tres_comparison.png
+│   ├── visualize_detailed_errors.png
+│   └── visualize_security_mitigation.png
+│
 ├── .gitignore
 └── README.md
 ```
 
-### Mô tả thành phần
+---
+
+# 📌 2. Mô Tả Thành Phần
 
 | Thành phần | Vai trò |
 |------------|----------|
-| `datasets/` | Bộ dữ liệu payload mô phỏng SQL Injection, XSS và Command Injection / SSRF |
-| `simulation.py` | Phase 1 - Mô phỏng trạng thái hệ thống trước giảm thiểu |
-| `remediation.py` | Pha 2 - Mô phỏng cơ chế giảm thiểu bảo mật |
-| `results_visualize.py` | Trực quan hóa chỉ số hiệu năng ban đầu |
-| `comparison.py` | So sánh trước và sau triển khai giảm thiểu |
-| `summary_table.py` | Tổng hợp chỉ số nghiên cứu và tính toán |
+| `datasets/` | Bộ payload mô phỏng SQL Injection, XSS, Command Injection và SSRF |
+| `experiments/simulation.py` | Phase 1 — Mô phỏng trạng thái hệ thống trước giảm thiểu |
+| `experiments/remediation.py` | Phase 2 — Mô phỏng cơ chế vá lỗi và giảm thiểu |
+| `analytics/results_visualize.py` | Trực quan hóa dữ liệu hiệu năng và lỗi |
+| `analytics/comparison.py` | So sánh chỉ số trước và sau triển khai bảo mật |
+| `analytics/risk_quantitative.py` | Định lượng rủi ro bảo mật theo chỉ số nghiên cứu |
+| `analytics/summary_table.py` | Tổng hợp bảng số liệu nghiên cứu |
+| `results/` | Lưu toàn bộ kết quả CSV và biểu đồ trực quan hóa |
 
 ---
 
-# 🚀 2. Hướng Dẫn Cài Đặt & Vận Hành
+# 🚀 3. Hướng Dẫn Cài Đặt & Vận Hành
 
-## Bước 1. Khởi động môi trường mục tiêu
+## Bước 1. Khởi động môi trường OWASP Juice Shop
 
-Đảm bảo OWASP Juice Shop đang hoạt động:
+Đảm bảo hệ thống mục tiêu đang hoạt động:
 
 ```bash
 http://localhost:3000
+```
+
+Có thể triển khai bằng Docker:
+
+```bash
+docker run -d -p 3000:3000 bkimminich/juice-shop
 ```
 
 ---
@@ -54,159 +92,219 @@ http://localhost:3000
 Mở Terminal tại thư mục dự án:
 
 ```bash
-pip install requests pandas statistics matplotlib seaborn tabulate openpyxl
+pip install requests pandas matplotlib seaborn tabulate openpyxl
 ```
 
 ---
 
-## Bước 3. Thực thi Phase 1 — Thu thập số liệu thực trạng
+## Bước 3. Thực thi Phase 1 — Attack Simulation
 
-Chạy mô phỏng tấn công dữ liệu lớn:
+Mô phỏng lưu lượng tấn công diện rộng:
 
 ```bash
-python simulation.py
+python experiments/simulation.py
 ```
 
 Đầu ra:
 
 ```text
-bao_cao_dinh_luong_loi.csv
+results/bao_cao_dinh_luong_loi.csv
 ```
 
 ---
 
-## Bước 4. Thực thi Phase 2 — Đánh giá hiệu quả giảm thiểu
+## Bước 4. Thực thi Phase 2 — Security Remediation
 
-Chạy cơ chế giả lập bảo vệ:
+Mô phỏng cơ chế giảm thiểu:
 
 - Parameterized Query
 - Input Sanitization
 - Domain Whitelist
+- Request Filtering
 
 Thực thi:
 
 ```bash
-python remediation.py
+python experiments/remediation.py
 ```
 
 Đầu ra:
 
 ```text
+results/bao_cao_dinh_luong_sau_va_loi.csv
+```
+
+---
+
+## Bước 5. Phân tích & Trực quan hóa dữ liệu
+
+Sinh biểu đồ phân tích:
+
+```bash
+python analytics/results_visualize.py
+
+python analytics/comparison.py
+```
+
+Định lượng rủi ro:
+
+```bash
+python analytics/risk_quantitative.py
+```
+
+Xuất bảng tổng hợp:
+
+```bash
+python analytics/summary_table.py
+```
+
+---
+
+# 📊 4. Chỉ Số Đầu Ra Nghiên Cứu
+
+Sau khi hoàn thành pipeline, hệ thống tự động sinh:
+
+## 1. Bảng số liệu nghiên cứu
+
+```text
+bao_cao_dinh_luong_loi.csv
 bao_cao_dinh_luong_sau_va_loi.csv
 ```
 
 ---
 
-## Bước 5. Trực quan hóa và kết xuất báo cáo
+## 2. Biểu đồ trực quan hóa
 
-Sinh biểu đồ phân tích:
-
-```bash
-python results_visualize.py
-
-python comparison.py
-```
-
-Xuất bảng tổng hợp nghiên cứu:
-
-```bash
-python summary_table.py
-```
-
----
-
-# 📊 3. Chỉ Số Đầu Ra Nghiên Cứu
-
-Sau khi hoàn thành toàn bộ pipeline, hệ thống sinh tự động:
-
-### 1. Bảng tổng hợp số liệu
+### Giai đoạn mô phỏng tấn công
 
 ```text
-bang_thong_ke_truoc_sau.md
+chuong4_kb01_sqli.png
+chuong4_kb02_xss.png
+chuong4_kb03_system.png
+chuong4_owasp_risk_matrix.png
+chuong4_tres_distribution.png
 ```
 
-Phục vụ sao chép trực tiếp vào báo cáo nghiên cứu.
-
-### 2. Tệp Excel chuẩn hóa
+### Giai đoạn giảm thiểu bảo mật
 
 ```text
-bang_thong_ke_truoc_sau.xlsx
+chuong5_kb01_remediation.png
+chuong5_kb02_remediation.png
+chuong5_kb03_remediation.png
+chuong5_owasp_heatmap_shift.png
+chuong5_tres_comparison.png
 ```
 
-Dùng cho phụ lục nghiên cứu và trình bày kết quả.
-
-### 3. Biểu đồ trực quan hóa
+### Tổng hợp phân tích
 
 ```text
+visualize_detailed_errors.png
 visualize_security_mitigation.png
 ```
 
-Thể hiện xu hướng thay đổi chỉ số an ninh trước và sau triển khai cơ chế bảo vệ.
-
 ---
 
-# ⚙️ 4. Quy Trình Xử Lý Dữ Liệu
+# ⚙️ 5. Quy Trình Xử Lý Dữ Liệu
 
 ```text
 Dataset Payload
-      ↓
-Pha 1 - Attack Simulation
-      ↓
-Raw Metrics Collection
-      ↓
-Mitigation Layer
-      ↓
+        ↓
+Attack Simulation
+        ↓
+HTTP Metrics Collection
+        ↓
+Risk Quantification
+        ↓
+Security Mitigation
+        ↓
 Post-Mitigation Measurement
-      ↓
-Visualization
-      ↓
+        ↓
+Visualization & Analytics
+        ↓
 Research Output
 ```
 
 ---
 
-# ⚖️ 5. Chính Sách Quản Lý Mã Nguồn (Git Policy)
+# 📈 6. Chỉ Số Định Lượng Nghiên Cứu
 
-Nguyên tắc lưu trữ:
+Hệ thống tập trung đánh giá:
 
-✅ Theo dõi phiên bản:
+- HTTP Status Distribution
+- Error Frequency
+- Response Time ($T_{res}$)
+- OWASP Risk Level
+- Risk Reduction Score ($R_{mit}$)
+- Security Heatmap Transition
 
-- Python source code (`*.py`)
-- Tập dữ liệu mẫu (`datasets/*.txt`)
+---
+
+# ⚖️ 7. Chính Sách Quản Lý Mã Nguồn (Git Policy)
+
+## Theo dõi phiên bản
+
+✅ Bao gồm:
+
+- Source code Python (`*.py`)
+- Dataset mô phỏng (`datasets/*.txt`)
 - README và tài liệu hướng dẫn
 
-❌ Không theo dõi:
+## Không theo dõi
 
-- File kết quả trung gian (`*.csv`)
-- File Excel đầu ra (`*.xlsx`)
-- File cache hoặc dữ liệu phát sinh cục bộ
+❌ Loại trừ:
 
-Ví dụ `.gitignore`
+- File cache
+- File sinh tự động
+- Dataset tạm thời
+
+Ví dụ `.gitignore`:
 
 ```gitignore
-*.csv
-*.xlsx
 __pycache__/
 *.pyc
+*.xlsx
+.DS_Store
 ```
 
 ---
 
-# 📌 Mục Tiêu Nghiên Cứu
+# 🎯 8. Mục Tiêu Nghiên Cứu
 
-- Đánh giá khả năng chịu tải của hệ thống TMĐT trước kịch bản tấn công diện rộng
+- Đánh giá khả năng chịu tải của hệ thống TMĐT trước tấn công diện rộng
 - Định lượng hiệu quả cơ chế giảm thiểu thông qua chỉ số $R_{mit}$
-- Xây dựng quy trình mô phỏng có khả năng tái lập phục vụ nghiên cứu học thuật
+- Phân tích biến động mức độ rủi ro OWASP trước và sau remediation
+- Xây dựng mô hình nghiên cứu có khả năng tái lập trong môi trường học thuật
 
 ---
 
-# 👥 Nhóm Thực Hiện
+# 🧪 9. Công Nghệ Sử Dụng
 
-**Đồ án cuối kỳ Bảo mật thương mại điện tử - Nhóm 4**
+| Thành phần | Công nghệ |
+|------------|------------|
+| Ngôn ngữ | Python |
+| Hệ thống mục tiêu | OWASP Juice Shop |
+| Xử lý dữ liệu | Pandas |
+| Visualization | Matplotlib, Seaborn |
+| Xuất báo cáo | OpenPyXL |
+| Kiểm thử | Security Stress Testing |
 
-Môn học: **Bảo mật Thương mại điện tử**
+---
 
-Nền tảng thử nghiệm:
+# 👥 10. Nhóm Thực Hiện 
+
+**Đồ án cuối kỳ — Bảo mật Thương mại điện tử**
+
+Nhóm thực hiện: **Nhóm 4**
+
+| Họ và tên | MSSV |
+|---|---|
+| Nguyễn Vũ Thanh Giang| 31231026898 |
+| Nguyễn Tùng Chi | 31231027333 |
+| Lâm Bảo Nghi | 31231020352 |
+| Đinh Thị Quỳnh Như | 31231025829 |
+| Nguyễn Thị Trúc Quỳnh| 31231021679 |
+
+Nền tảng nghiên cứu:
 
 - OWASP Juice Shop
 - Python Data Pipeline
