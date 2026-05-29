@@ -1,4 +1,4 @@
-# 🛡️ Hệ Thống Mô Phỏng Đòn Tấn Công Diện Rộng & Đánh Giá Chỉ Số Giảm Thiểu Rủi Ro
+# 🛡️ Hệ Thống Mô Phỏng Tấn Công Diện Rộng & Đánh Giá Chỉ Số Giảm Thiểu Rủi Ro
 
 Dự án xây dựng một hệ thống mô phỏng kiểm thử áp lực bảo mật (Security Stress Testing) trên nền tảng thương mại điện tử OWASP Juice Shop thông qua Data Pipeline tự động bằng Python.
 
