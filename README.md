@@ -1,4 +1,6 @@
 # 🛡️ Hệ Thống Mô Phỏng Tấn Công Diện Rộng & Đánh Giá Chỉ Số Giảm Thiểu Rủi Ro
+[![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://www.python.org/)
+
 
 Dự án xây dựng một hệ thống mô phỏng kiểm thử áp lực bảo mật (Security Stress Testing) trên nền tảng thương mại điện tử OWASP Juice Shop thông qua Data Pipeline tự động bằng Python.
 
