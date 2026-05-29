@@ -1,24 +1,41 @@
-# =========================================================================
-# GITIGNORE CONFIGURATION - ECOM SECURITY SIMULATION PIPELINE
-# =========================================================================
+# GITIGNORE CONFIGURATION
+# ECOM SECURITY SIMULATION PIPELINE
 
-
-
-# CHỈ ĐỊNH: Cho phép push các file dataset dạng .txt trong thư mục datasets
-!datasets/*.txt
-!*.txt
-
-# Chặn thư mục cài đặt môi trường ảo và bộ đệm cache của Python
+# PYTHON CACHE & BUILD FILES
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.so
+*.egg-info/
+build/
+dist/
+
+# TEST & TOOL CACHE
 .pytest_cache/
+.mypy_cache/
+.cache/
+
+# VIRTUAL ENVIRONMENTS
 venv/
 .venv/
 env/
-.env
 
-# Chặn các file cấu hình hệ điều hành cục bộ
+#ENVIRONMENT VARIABLES
+.env
+.env.*
+
+# JUPYTER NOTEBOOK CHECKPOINTS
+.ipynb_checkpoints/
+
+# OPERATING SYSTEM FILES
 .DS_Store
 Thumbs.db
+
+# GENERATED REPORT FILES
+*.xlsx
+*.log
+
+#ALLOW DATASET RULES
+!datasets/*.txt
+!*.txt
