@@ -7,7 +7,7 @@ import re
 from urllib.parse import urlparse
 
 BASE_URL = "http://localhost:3000"
-REPORT_FILE = "bao_cao_dinh_luong_sau_va_loi.csv"
+REPORT_FILE = "../results/bao_cao_dinh_luong_sau_va_loi.csv"
 
 def load_dataset_all(file_path):
     if not os.path.exists(file_path):
@@ -20,9 +20,10 @@ print("=================================================================")
 print("🛡️ KHỞI ĐỘNG HỆ THỐNG MÔ PHỎNG ĐÃ ÁP DỤNG BẢN VÁ LỖI")
 print("=================================================================")
 
-sqli_payloads = load_dataset_all(os.path.join("datasets", "dataset_sqli.txt"))
-xss_payloads = load_dataset_all(os.path.join("datasets", "dataset_xss.txt"))
-system_payloads = load_dataset_all(os.path.join("datasets", "dataset_system.txt"))
+sqli_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_sqli.txt"))
+xss_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_xss.txt"))
+system_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_system.txt"))
+
 
 print(f"✔ Tổng quy mô kiểm thử sau giảm thiểu: {len(sqli_payloads) + len(xss_payloads) + len(system_payloads)} Requests!")
 

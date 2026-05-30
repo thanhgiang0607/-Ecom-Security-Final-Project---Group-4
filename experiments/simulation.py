@@ -5,8 +5,7 @@ import os
 import random
 
 BASE_URL = "http://localhost:3000"
-REPORT_FILE = "bao_cao_dinh_luong_loi.csv"
-
+REPORT_FILE = "../results/bao_cao_dinh_luong_loi.csv"
 def load_dataset_all(file_path):
     if not os.path.exists(file_path):
         print(f"❌ Không tìm thấy file: {file_path}")
@@ -15,9 +14,9 @@ def load_dataset_all(file_path):
         return [line.strip() for line in f if line.strip()]
 
 print("--- ĐANG NẠP TOÀN BỘ BIG DATASET VÀO BỘ NHỚ ---")
-sqli_payloads = load_dataset_all(os.path.join("datasets", "dataset_sqli.txt"))
-xss_payloads = load_dataset_all(os.path.join("datasets", "dataset_xss.txt"))
-system_payloads = load_dataset_all(os.path.join("datasets", "dataset_system.txt"))
+sqli_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_sqli.txt"))
+xss_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_xss.txt"))
+system_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_system.txt"))
 
 print(f"✔ Tổng quy mô giả lập: {len(sqli_payloads) + len(xss_payloads) + len(system_payloads)} Requests!")
 # 2. Khởi tạo Session để tối ưu tốc độ và giữ trạng thái kết nối
