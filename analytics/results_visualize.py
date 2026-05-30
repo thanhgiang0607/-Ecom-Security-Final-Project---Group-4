@@ -7,7 +7,7 @@ plt.rcParams['font.sans-serif'] = 'Arial'
 plt.rcParams['font.family'] = 'sans-serif'
 
 # Đọc file dữ liệu 3000 mẫu quy mô lớn mới
-df = pd.read_csv('bao_cao_dinh_luong_loi.csv')
+df = pd.read_csv('../results/bao_cao_dinh_luong_loi.csv')
 df['HTTP Status'] = df['HTTP Status'].astype(str)
 
 # BIỂU ĐỒ 1: PHÂN PHỐI MÃ TRẠNG THÁI HTTP (HTTP STATUS CODE DISTRIBUTION)

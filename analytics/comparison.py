@@ -7,8 +7,8 @@ sns.set_theme(style="whitegrid")
 plt.rcParams['font.sans-serif'] = 'Arial'
 plt.rcParams['font.family'] = 'sans-serif'
 
-FILE_PRE = 'bao_cao_dinh_luong_loi.csv'
-FILE_POST = 'bao_cao_dinh_luong_sau_va_loi.csv'
+FILE_PRE = '../results/bao_cao_dinh_luong_loi.csv'
+FILE_POST = '../results/bao_cao_dinh_luong_sau_va_loi.csv'
 OUTPUT_IMAGE = 'visualize_security_mitigation.png'
 
 if not os.path.exists(FILE_PRE) or not os.path.exists(FILE_POST):

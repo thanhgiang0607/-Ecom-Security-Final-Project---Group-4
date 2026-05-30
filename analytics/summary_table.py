@@ -4,8 +4,8 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
-FILE_TRUOC = "bao_cao_dinh_luong_loi.csv" 
-FILE_SAU = "bao_cao_dinh_luong_sau_va_loi.csv"
+FILE_TRUOC = "../results/bao_cao_dinh_luong_loi.csv" 
+FILE_SAU = "../results/bao_cao_dinh_luong_sau_va_loi.csv"
 OUTPUT_MARKDOWN = "bang_thong_ke_truoc_sau.md"
 OUTPUT_EXCEL = "bang_thong_ke_truoc_sau.xlsx"
 
