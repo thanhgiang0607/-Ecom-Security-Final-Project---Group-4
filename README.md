@@ -292,26 +292,4 @@ __pycache__/
 
 ---
 
-# 👥 10. Nhóm Thực Hiện 
 
-**Đồ án cuối kỳ — Bảo mật Thương mại điện tử**
-
-Nhóm thực hiện: **Nhóm 4**
-
-| Họ và tên | MSSV |
-|---|---|
-| Nguyễn Vũ Thanh Giang| 31231026898 |
-| Nguyễn Tùng Chi | 31231027333 |
-| Lâm Bảo Nghi | 31231020352 |
-| Đinh Thị Quỳnh Như | 31231025829 |
-| Nguyễn Thị Trúc Quỳnh| 31231021679 |
-
-Nền tảng nghiên cứu:
-
-- OWASP Juice Shop
-- Python Data Pipeline
-- Security Stress Testing Framework
-
----
-
-> Academic purpose only — phục vụ nghiên cứu và thực nghiệm bảo mật trong môi trường kiểm thử.
