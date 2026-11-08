@@ -6,8 +6,8 @@ from openpyxl.utils import get_column_letter
 
 FILE_TRUOC = "../results/bao_cao_dinh_luong_loi.csv" 
 FILE_SAU = "../results/bao_cao_dinh_luong_sau_va_loi.csv"
-OUTPUT_MARKDOWN = "bang_thong_ke_truoc_sau.md"
-OUTPUT_EXCEL = "bang_thong_ke_truoc_sau.xlsx"
+OUTPUT_MARKDOWN = "../results/bang_thong_ke_truoc_sau.md"
+OUTPUT_EXCEL = "../results/bang_thong_ke_truoc_sau.xlsx"
 
 def xu_ly_du_lieu_giai_doan(file_path, ten_giai_doan):
     if not os.path.exists(file_path):

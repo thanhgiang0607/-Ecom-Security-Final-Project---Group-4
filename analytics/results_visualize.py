@@ -18,7 +18,7 @@ ax.set_xlabel('Loại Tấn Công (Attack Type)', fontsize=12, fontweight='bold'
 ax.set_ylabel('Số Lượng Gói Tin (Request Count)', fontsize=12, fontweight='bold')
 ax.legend(title='HTTP Status Code', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
-plt.savefig('visualize_http_status.png', dpi=300)
+plt.savefig('../results/visualize_http_status.png', dpi=300)
 plt.close()
 print("✔ Đã xuất biểu đồ: visualize_http_status.png")
 
@@ -36,7 +36,7 @@ for p in ax.patches:
                 ha='center', va='center', xytext=(0, 8), textcoords='offset points', fontsize=11, fontweight='bold')
 
 plt.tight_layout()
-plt.savefig('visualize_response_time.png', dpi=300)
+plt.savefig('../results/visualize_response_time.png', dpi=300)
 plt.close()
 print("✔ Đã xuất biểu đồ: visualize_response_time.png")
 
@@ -57,6 +57,6 @@ for p in ax.patches:
                     ha='left', va='center', xytext=(5, 0), textcoords='offset points', fontsize=10, fontweight='bold')
 
 plt.tight_layout()
-plt.savefig('visualize_detailed_errors.png', dpi=300)
+plt.savefig('../results/visualize_detailed_errors.png', dpi=300)
 plt.close()
 print("✔ Đã xuất biểu đồ nâng cấp chi tiết lỗi: visualize_detailed_errors.png")

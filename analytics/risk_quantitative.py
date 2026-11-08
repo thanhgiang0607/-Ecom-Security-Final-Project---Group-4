@@ -9,7 +9,7 @@ import os
 
 # --- CẤU HÌNH ĐƯỜNG DẪN ---
 FILE_LOG_THO = "../results/bao_cao_dinh_luong_loi.csv"
-OUTPUT_ANH   = "chuong4_owasp_risk_matrix.png"
+OUTPUT_ANH   = "../results/chuong4_owasp_risk_matrix.png"
 
 # ── FONT & STYLE (nền trắng) ─────────────────────────────────────────────────
 plt.rcParams.update({
@@ -109,10 +109,12 @@ if os.path.exists(FILE_LOG_THO):
 
         elif ma_kb=='KB_02':
 
+            # Stored XSS "thành công" = payload được LƯU vào DB -> HTTP 201,
+            # KHÔNG phải 500 (500 là bị bộ lọc Validation chặn = an toàn).
             vulnerable=len(
                 df_sub[
                     df_sub['HTTP Status']
-                    =='500'
+                    =='201'
                 ]
             )
 

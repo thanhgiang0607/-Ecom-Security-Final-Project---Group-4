@@ -20,7 +20,7 @@ Ecom_Security_Final_Project/
 │
 ├── analytics/
 │   ├── comparison.py
-│   ├── remediation.py
+│   ├── reme_results.py
 │   ├── results_visualize.py
 │   ├── risk_quantitative.py
 │   └── summary_table.py
@@ -66,6 +66,7 @@ Ecom_Security_Final_Project/
 | `analytics/results_visualize.py` | Trực quan hóa dữ liệu hiệu năng và lỗi |
 | `analytics/comparison.py` | So sánh chỉ số trước và sau triển khai bảo mật |
 | `analytics/risk_quantitative.py` | Định lượng rủi ro bảo mật theo chỉ số nghiên cứu |
+| `analytics/reme_results.py` | Phân tích & trực quan hóa kết quả sau khắc phục (heatmap OWASP, so sánh $T_{res}$, chỉ số $R_{mit}$) |
 | `analytics/summary_table.py` | Tổng hợp bảng số liệu nghiên cứu |
 | `results/` | Lưu toàn bộ kết quả CSV và biểu đồ trực quan hóa |
 
@@ -154,11 +155,32 @@ python analytics/comparison.py
 python analytics/risk_quantitative.py
 ```
 
+Phân tích & trực quan hóa kết quả sau khắc phục (heatmap OWASP, so sánh $T_{res}$, $R_{mit}$):
+
+```bash
+python analytics/reme_results.py
+```
+
 Xuất bảng tổng hợp:
 
 ```bash
 python analytics/summary_table.py
 ```
+
+---
+
+# 📈 Dashboard Tương Tác (Streamlit)
+
+Giao diện trực quan đọc trực tiếp kết quả trong `results/` (không cần Juice Shop):
+KPI rủi ro, Risk Score trước/sau theo kịch bản, **OWASP Risk Matrix** dịch chuyển
+A → B, phân bố HTTP status, thời gian phản hồi, và bộ lọc khám phá chi tiết.
+
+```bash
+pip install streamlit plotly
+streamlit run app.py
+```
+
+Mặc định mở tại `http://localhost:8501`.
 
 ---
 

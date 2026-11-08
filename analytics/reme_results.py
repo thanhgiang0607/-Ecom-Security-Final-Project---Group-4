@@ -225,9 +225,11 @@ for ma_kb in ['KB_01','KB_02','KB_03']:
 
         elif ma_kb == 'KB_02':
 
+            # Stored XSS "thành công" = payload được LƯU vào DB -> HTTP 201,
+            # KHÔNG phải 500 (500 là bị bộ lọc Validation chặn = an toàn).
             vulnerable = len(
                 df_sub[
-                    df_sub['HTTP Status']=='500'
+                    df_sub['HTTP Status']=='201'
                 ]
             )
 

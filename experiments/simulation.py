@@ -3,6 +3,8 @@ import csv
 import time
 import os
 import random
+import re
+import json
 
 BASE_URL = "http://localhost:3000"
 REPORT_FILE = "../results/bao_cao_dinh_luong_loi.csv"
@@ -13,10 +15,33 @@ def load_dataset_all(file_path):
     with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
         return [line.strip() for line in f if line.strip()]
 
+def load_system_payloads(file_path):
+    """dataset_system.txt là JSON (mỗi phần tử có trường 'payload').
+    Vì file có thể thiếu dấu phẩy giữa các object, ta ưu tiên json.loads;
+    nếu lỗi thì trích riêng trường 'payload' bằng regex để lấy đúng payload tấn công
+    (thay vì đọc từng dòng JSON như một 'request' sai lệch)."""
+    if not os.path.exists(file_path):
+        print(f"❌ Không tìm thấy file: {file_path}")
+        return []
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        raw = f.read()
+    try:
+        data = json.loads(raw)
+        return [str(item["payload"]) for item in data
+                if isinstance(item, dict) and item.get("payload") is not None]
+    except Exception:
+        payloads = []
+        for m in re.finditer(r'"payload"\s*:\s*"((?:[^"\\]|\\.)*)"', raw):
+            try:
+                payloads.append(json.loads('"' + m.group(1) + '"'))
+            except Exception:
+                payloads.append(m.group(1))
+        return payloads
+
 print("--- ĐANG NẠP TOÀN BỘ BIG DATASET VÀO BỘ NHỚ ---")
 sqli_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_sqli.txt"))
 xss_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_xss.txt"))
-system_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_system.txt"))
+system_payloads = load_system_payloads(os.path.join("..", "datasets", "dataset_system.txt"))
 
 print(f"✔ Tổng quy mô giả lập: {len(sqli_payloads) + len(xss_payloads) + len(system_payloads)} Requests!")
 # 2. Khởi tạo Session để tối ưu tốc độ và giữ trạng thái kết nối

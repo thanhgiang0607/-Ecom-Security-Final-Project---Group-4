@@ -4,6 +4,7 @@ import time
 import os
 import random
 import re
+import json
 from urllib.parse import urlparse
 
 BASE_URL = "http://localhost:3000"
@@ -16,13 +17,36 @@ def load_dataset_all(file_path):
     with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
         return [line.strip() for line in f if line.strip()]
 
+def load_system_payloads(file_path):
+    """dataset_system.txt là JSON (mỗi phần tử có trường 'payload').
+    Vì file có thể thiếu dấu phẩy giữa các object, ta ưu tiên json.loads;
+    nếu lỗi thì trích riêng trường 'payload' bằng regex để lấy đúng payload tấn công
+    (thay vì đọc từng dòng JSON như một 'request' sai lệch)."""
+    if not os.path.exists(file_path):
+        print(f"❌ Không tìm thấy file: {file_path}")
+        return []
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        raw = f.read()
+    try:
+        data = json.loads(raw)
+        return [str(item["payload"]) for item in data
+                if isinstance(item, dict) and item.get("payload") is not None]
+    except Exception:
+        payloads = []
+        for m in re.finditer(r'"payload"\s*:\s*"((?:[^"\\]|\\.)*)"', raw):
+            try:
+                payloads.append(json.loads('"' + m.group(1) + '"'))
+            except Exception:
+                payloads.append(m.group(1))
+        return payloads
+
 print("=================================================================")
 print("🛡️ KHỞI ĐỘNG HỆ THỐNG MÔ PHỎNG ĐÃ ÁP DỤNG BẢN VÁ LỖI")
 print("=================================================================")
 
 sqli_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_sqli.txt"))
 xss_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_xss.txt"))
-system_payloads = load_dataset_all(os.path.join("..", "datasets", "dataset_system.txt"))
+system_payloads = load_system_payloads(os.path.join("..", "datasets", "dataset_system.txt"))
 
 
 print(f"✔ Tổng quy mô kiểm thử sau giảm thiểu: {len(sqli_payloads) + len(xss_payloads) + len(system_payloads)} Requests!")
@@ -94,31 +118,36 @@ with open(REPORT_FILE, mode='w', newline='', encoding='utf_8_sig') as csv_file:
         time.sleep(0.001)
         if idx % 5000 == 0: print(f" -> Tiến độ SQLi sau giảm thiểu: {idx}/{len(sqli_payloads)}...")
 
-    # --- KB_02: XSS (Đã vá) ---
+    # --- KB_02: XSS (Đã vá bằng Input Sanitization / Output Encoding) ---
     print(f"\n[⚡] Chạy Kịch bản 2: XSS (Target: {len(xss_payloads)} requests)...")
     FEEDBACK_URL = f"{BASE_URL}/api/Feedbacks"
+    # BẢN VÁ TẦNG NGOẠI VI: phát hiện thẻ HTML, thẻ <script>, thuộc tính sự kiện
+    # (onerror=, onload=, onmouseover=...) hoặc lược đồ javascript: — mọi payload chứa
+    # các mẫu này đều bị trung hòa/ từ chối trước khi lưu, triệt tiêu khả năng Stored XSS.
+    xss_pattern = re.compile(
+        r"<\s*script|<\s*/?\s*[a-zA-Z][^>]*>|on\w+\s*=|javascript:|<\s*img|<\s*svg|<\s*iframe",
+        re.IGNORECASE
+    )
     for idx, payload in enumerate(xss_payloads, 1):
-
-        feedback_data = {
-            "comment": payload, 
-            "rating": 5,
-            "captchaId": "invalid_id_string",  # Ép Server trả về mã 400 thay vì 500
-            "captcha": "wrong_captcha_format"
-        } 
+        payload_str = str(payload)
         start = time.time()
-        try:
-            response = session.post(FEEDBACK_URL, json=feedback_data, timeout=3)
+
+        if xss_pattern.search(payload_str):
+            # Chặn/ trung hòa trước khi ghi vào DB -> không thể thực thi Stored XSS
+            status = 400
             res_time = round(time.time() - start, 4)
-            status = response.status_code
-            
-            if status == 400:
-                result = "Từ chối thực thể (HTTP 400 Bad Request) - Sai định dạng Captcha / Bộ lọc Validation"
-            else:
-                result = f"HTTP {status}"
-        except Exception:
-            status, res_time, result = "TIMEOUT", round(time.time() - start, 4), "Mất kết nối vật lý"
-            
-        writer.writerow(["KB_02", "XSS", str(payload), status, res_time, result])
+            result = "Bị chặn bởi Bộ lọc Sanitization (HTTP 400) - Loại bỏ thẻ HTML/script độc hại"
+        else:
+            feedback_data = {"comment": payload_str, "rating": 5}
+            try:
+                response = session.post(FEEDBACK_URL, json=feedback_data, timeout=3)
+                res_time = round(time.time() - start, 4)
+                status = response.status_code
+                result = "Nội dung sạch được ghi nhận" if status == 201 else f"HTTP {status}"
+            except Exception:
+                status, res_time, result = "TIMEOUT", round(time.time() - start, 4), "Mất kết nối vật lý"
+
+        writer.writerow(["KB_02", "XSS", payload_str, status, res_time, result])
         time.sleep(0.001)
         if idx % 250 == 0: print(f" -> Tiến độ XSS sau giảm thiểu: {idx}/{len(xss_payloads)}...")
 

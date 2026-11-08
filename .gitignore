@@ -32,6 +32,10 @@ env/
 .DS_Store
 Thumbs.db
 
+# SESSION / TOOL STATE
+.omc/
+.claude/
+
 # GENERATED REPORT FILES
 *.xlsx
 *.log

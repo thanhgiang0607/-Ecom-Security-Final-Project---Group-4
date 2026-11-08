@@ -1,0 +1,13 @@
+# Core pipeline
+requests
+pandas
+numpy
+# Visualization
+matplotlib
+seaborn
+plotly
+# Reporting
+tabulate
+openpyxl
+# Interactive dashboard
+streamlit
